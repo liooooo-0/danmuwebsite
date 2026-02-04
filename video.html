@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浮生影迹 - 疍家影像博物馆</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/video.css">
+</head>
+
+<body class="video-page">
+
+    <div id="videoLightbox" class="lightbox">
+        <div class="lightbox-close" id="closeLightbox">&times;</div>
+        <div class="lightbox-content">
+            <div id="videoPlayerContainer"></div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-home">← 归航</a>
+
+    <header class="video-header">
+        <h1>浮生影迹</h1>
+        <p>VOICE OF THE SEA: VISUAL ARCHIVE</p>
+    </header>
+
+    <main class="content-container">
+        <aside class="sidebar-left">
+            <div class="side-tag">FEATURED</div>
+            <div class="carousel-viewport">
+                <div class="carousel-inner" id="carouselInner">
+                    <div class="featured-mini-card">
+                        <div class="f-mini-img" style="background-image: url('assets/img/doc-1.jpg');"></div>
+                        <div class="f-mini-text">
+                            <h5>第一部：沧海桑田</h5>
+                            <p>记录最后一代远洋疍民的生活实录。</p>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+            <div class="vertical-gold-line"></div>
+        </aside>
+
+        <section class="portal-main">
+            
+            <div class="video-group">
+                <div class="video-card">
+                    <div class="card-img" style="background-image: url('assets/img/doc-hero.jpg');"></div>
+                    <div class="card-mask"></div>
+                    <h3 class="card-title">疍家纪事</h3>
+                    <div class="card-hover-txt">
+                        <p>记录疍家人从水上迁徙到陆地的真实生命轨迹，跨越三年的影像追踪。</p>
+                    </div>
+                </div>
+                
+                <div class="video-info-row">
+                    <div class="meta-data">
+                        <span class="badge">2022</span>
+                        <span class="label">导演：黎恩 / 陈墨 / 林汐</span>
+                    </div>
+                    <div class="ep-nav">
+                        <a href="#" class="ep-tag" data-video-url="assets/video/4C3A6771.MP4">I. 沧海桑田</a>
+                        <a href="#" class="ep-tag">II. 疍家渔火</a>
+                        <a href="#" class="ep-tag">III. 归航之歌</a>
+                        <a href="#" class="ep-tag">IV. 岁月留声</a>
+                        <a href="#" class="ep-tag">V. 最后的家船</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-group">
+                <div class="video-card">
+                    <div class="card-img" style="background-image: url('assets/img/mv-hero.jpg');"></div>
+                    <div class="card-mask"></div>
+                    <h3 class="card-title">咸水MV</h3>
+                    <div class="card-hover-txt">
+                        <p>以现代视觉重构古老咸水歌，听见水上人家流动的乡愁与情感回响。</p>
+                    </div>
+                </div>
+                
+                <div class="video-info-row">
+                    <div class="meta-data">
+                        <span class="badge">2023</span>
+                        <span class="label">导演：张影 / 王弦</span>
+                    </div>
+                    <div class="ep-nav">
+                        <a href="#" class="ep-tag">I. 叹家姐</a>
+                        <a href="#" class="ep-tag">II. 摇橹曲</a>
+                        <a href="#" class="ep-tag">III. 织网谣</a>
+                        <a href="#" class="ep-tag">IV. 潮起</a>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="js/video.js"></script>
+</body>
+</html>

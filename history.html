@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疍史溯源 - 疍家文化时间轴</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --text-gold: #c9ad86;
+            --dim-gold: rgba(201, 173, 134, 0.5); 
+            --line-subtle: rgba(201, 173, 134, 0.15); 
+            --serif: 'Noto Serif SC', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            background-color: var(--bg-dark); 
+            background-image: radial-gradient(circle at 50% 50%, #161a1e 0%, #0a0b0d 100%);
+            color: #f5f5f5; 
+            font-family: var(--serif);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 返回按钮 --- */
+        .back-btn {
+            position: fixed; top: 40px; left: 5%; z-index: 1000;
+            color: var(--dim-gold); text-decoration: none; font-size: 0.8rem;
+            letter-spacing: 2px; transition: 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+        .back-btn:hover { color: var(--text-gold); border-color: var(--text-gold); }
+
+        /* --- 头部标题 --- */
+        .timeline-header {
+            padding: 60px 0 20px;
+            text-align: center;
+        }
+        .timeline-header h1 {
+            font-size: 2.8rem;
+            font-weight: 200;
+            letter-spacing: 12px;
+            color: var(--text-gold);
+        }
+
+        /* --- 简介卡片 --- */
+        .intro-section {
+            max-width: 850px;
+            margin: 0 auto 0; /* 移除底部间距，靠容器的padding拉开 */
+            padding: 0 20px;
+            position: relative;
+            z-index: 100;
+        }
+        .intro-card {
+            background: rgba(10, 11, 13, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--line-subtle);
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 2px solid var(--text-gold);
+        }
+        .intro-card h2 {
+            font-size: 1.3rem;
+            color: var(--text-gold);
+            margin-bottom: 15px;
+            font-weight: 200;
+            letter-spacing: 5px;
+        }
+        .intro-card p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: justify;
+        }
+
+        /* --- 时间轴容器 --- */
+        .timeline-container {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-top: 150px; /* 关键修改：在这里设置巨大的顶部间距，彻底推开简介卡片 */
+            padding-bottom: 200px;
+        }
+
+        /* 中央轴线 - 保持不变 */
+        .timeline-axis {
+            position: absolute;
+            left: 50%; top: 0; bottom: 0;
+            width: 1px;
+            background: var(--line-subtle);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        /* 节点容器 - 极致交叠：通过负 margin-top 强制向上移动 */
+        .timeline-node {
+            position: relative;
+            width: 100%;
+            margin-top: -120px; /* 卡片之间的交叠间距 */
+            display: flex;
+            z-index: 10;
+            padding: 0 5%;
+        }
+        
+        /* 第一个节点禁止向上交叠，确保不挡住简介 */
+        .timeline-node:first-child { 
+            margin-top: 0 !important; 
+        }
+
+        /* 中间的小圆点 */
+        .node-dot {
+            width: 8px; height: 8px;
+            background: var(--text-gold);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%; top: 150px; 
+            transform: translateX(-50%);
+            z-index: 50;
+            box-shadow: 0 0 10px rgba(201, 173, 134, 0.5);
+        }
+
+        /* 节点卡片 - 增加宽度与半透明感 */
+        .node-card {
+            width: 48%; 
+            background: rgba(15, 17, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--line-subtle);
+            padding: 25px 30px;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.6); 
+        }
+
+        /* 奇偶项布局 */
+        .timeline-node:nth-child(odd) { justify-content: flex-start; z-index: 10; }
+        .timeline-node:nth-child(even) { justify-content: flex-end; z-index: 20; } 
+
+        /* 悬停效果：亮起并置顶 */
+        .timeline-node:hover { z-index: 100 !important; }
+        .timeline-node:hover .node-card {
+            border-color: var(--text-gold);
+            background: rgba(25, 28, 32, 0.98);
+            transform: translateY(-10px); 
+        }
+
+        .timeline-node.active .node-card {
+            border-color: var(--text-gold);
+            background: rgba(30, 34, 40, 1);
+        }
+
+        /* --- 内容分级 --- */
+        .label-period {
+            display: inline-block;
+            background: var(--text-gold);
+            color: var(--bg-dark);
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .label-year {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--dim-gold);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-family: sans-serif;
+        }
+
+        .node-title {
+            font-size: 1.25rem;
+            color: var(--text-gold);
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--line-subtle);
+            padding-bottom: 8px;
+        }
+
+        .node-desc {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: justify;
+        }
+        .timeline-node:hover .node-desc,
+        .timeline-node.active .node-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 900px) {
+            .timeline-container { padding-top: 50px; }
+            .timeline-node { margin-top: -20px; }
+            .timeline-axis { left: 20px; }
+            .node-dot { left: 20px; top: 50px; }
+            .node-card { width: 85%; margin-left: 40px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn">← 归航</a>
+
+    <header class="timeline-header">
+        <h1>疍史溯源</h1>
+    </header>
+
+    <section class="intro-section">
+        <div class="intro-card">
+            <h2>“疍”之简介</h2>
+            <p>
+                疍民，亦被称为“蜒民”，或被赋予蜑家、蛋家、艇家等别称。是一群在中国的广东、广西、福建、海南等地区活跃，以海洋为生存环境，以舟为居所的特殊族群。他们视水为陆，伏波江海。名称在历史记载上经历了“诞—蜑—蛋—疍—水上人家”的变迁。陈序经在其著作《疍民的研究》中曾提到有关三十余种疍民的起源与传说，目前的主流的观点认为疍民是古代百越族的后裔。对于“疍”字的起源，说法不一。疍民在我国历史上因文化差异和生活差异被长期视为居于水上的“他类”，处于被书写、被排斥的族群，不可避免的被强行带上野蛮、无知、贱民的烙印。
+            </p>
+        </div>
+    </section>
+
+    <div class="timeline-container">
+        <div class="timeline-axis"></div>
+
+        <!-- 2. 汉晋 -->
+        <div class="timeline-node active">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">汉晋时期</span>
+                <span class="label-year">东汉末 — 东晋</span>
+                <h2 class="node-title">诞名初现</h2>
+                <p class="node-desc">
+                    “诞”作为族群名称出现的时间，最早在东汉末期，如《世本·氏姓篇》记载:“廪君之先, 故出巫诞”。而武陵诞则见载于《三国志·黄盖传》:“自春讫夏, 寇乱尽平, 诸幽邃巴、醴、由、诞邑侯君长, 皆改操易节,奉礼请见, 郡境遂清”。诞又写作蜑、蜒。东晋常璩所著《华阳国志》：“其地东至鱼腹，西至棘道，北接汉中，南极黔潼。其属有崈、濮、苴、共、奴、獽、夷、蜒蛮。”在早期，疍民独立于中央政府的“编户齐民”体系之外。
+                </p>
+            </div>
+        </div>
+
+        <!-- 3. 隋唐 -->
+        <div class="timeline-node">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">隋唐时期</span>
+                <span class="label-year">581 — 907</span>
+                <h2 class="node-title">向岭南迁徙</h2>
+                <p class="node-desc">
+                    《隋书》所载中则出现了新的变化，如“南蛮杂类，与华人错居，曰蜒、曰狼、曰俚、曰獠、曰頠...古先所谓百越是也”，此处的“蜒”或是在指魏晋南北朝时被中央长期镇压的蜑人，在汉人的迁徙中逐渐同化或消亡。随后蜑民从西南地区转居至岭南地区，唐朝刘恂在《岭表异录》中：“邕州旧以刺竹为城，蛮蜑来侵，竟不能入。”位于广西的邕州，则是蜑人迁徙岭南的最好展现。唐代实施“记丁输课”制度后，疍民开始受到中央政府管控。
+                </p>
+            </div>
+        </div>
+
+        <!-- 4. 宋朝 -->
+        <div class="timeline-node">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">宋朝时期</span>
+                <span class="label-year">960 — 1279</span>
+                <h2 class="node-title">族群特征确立</h2>
+                <p class="node-desc">
+                    以正统自居的宋朝，文人士大夫赋予了“蜑”除去民族差异以外的区域差异内涵，蜑被概括为居住在岭南地区而与汉文化有较大差异的区域族群。其中《太平寰宇》记载道：“（新会县）蜑户，县所管，生于江海，居于舟船，随潮往来，以捕鱼为业。”这一记载被认为是目前已知的岭南水上居民被称为“蜑”的最早记录。到此，蜑族人以陆居转为水居，摇撸海中的族群特征才被最终被确定下来，此时的“蜑”才是现在两广及南海疍民的起源。
+                </p>
+            </div>
+        </div>
+
+        <!-- 5. 明清 -->
+        <div class="timeline-node">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">明清时期</span>
+                <span class="label-year">1368 — 1912</span>
+                <h2 class="node-title">贱籍与开豁</h2>
+                <p class="node-desc">
+                    初期，明太祖朱元璋将疍民纳入“贱籍”之列。其居住环境是受到政府严格控制的，具体到疍民身上，则体现为不可上岸与民杂居。清朝初年，清政府沿用明朝政策管理，但由于“贱民”斗争愈演愈烈，清政府出于缓和社会矛盾需求，对“贱民”进行开豁。雍正皇帝明确强调疍民是良民而非“贱民”，要求地方上将疍民与平民同等看待。但这些举措并没能从具体现实生活中解放疍民，在科举领域，疍民的身份仍不被认同。
+                </p>
+            </div>
+        </div>
+
+        <!-- 6. 民国时期 -->
+        <div class="timeline-node">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">民国时期</span>
+                <span class="label-year">1912 — 1949</span>
+                <h2 class="node-title">公权与保障</h2>
+                <p class="node-desc">
+                    1912年中华民国成立，临时大总统孙中山颁布《大总统通令开放疍户惰民等许其一体享有公权私权文》，宣布疍民享有选举、参政等公权，以及居住、言论、出版、集会、信教自由等权利。该法案确认了疍民享有平等的政治与社会权利，推动了后续保障。1934年民政厅颁布《严禁压迫疍民恶习》训令，要求“断不容划分畛域，擅定禁例，以欺压疍民”。
+                </p>
+            </div>
+        </div>
+
+        <!-- 7. 现代 -->
+        <div class="timeline-node">
+            <div class="node-dot"></div>
+            <div class="node-card">
+                <span class="label-period">新中国时期</span>
+                <span class="label-year">1949 — 至今</span>
+                <h2 class="node-title">上岸与重生</h2>
+                <p class="node-desc">
+                    1954年周恩来总理指示广州推进疍民上岸。1956至1987年广州疍民陆续定居；海南陵水县1958年成立新村人民公社，政府规划荒滩分配宅基地，鼓励疍民建房，1975年后多数疍民告别水上生活。改革开放后，新村港引入网箱鱼排养殖模式成效显著，部分疍民重返新村从事水产养殖，加之南湾猴岛地理优势，旅游业兴起，新村镇成为疍家文化重要考察地。
+                </p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

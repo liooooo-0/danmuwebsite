@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沧海礼俗 - 疍家文化仪式感</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --text-gold: #c9ad86;
+            --dim-gold: rgba(201, 173, 134, 0.5); 
+            --line-subtle: rgba(201, 173, 134, 0.15); 
+            --serif: 'Noto Serif SC', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            background-color: var(--bg-dark); 
+            background-image: radial-gradient(circle at 50% 50%, #161a1e 0%, #0a0b0d 100%);
+            color: #f5f5f5; 
+            font-family: var(--serif);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 返回按钮 --- */
+        .back-btn {
+            position: fixed; top: 40px; left: 5%; z-index: 1000;
+            color: var(--dim-gold); text-decoration: none; font-size: 0.8rem;
+            letter-spacing: 2px; transition: 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+        .back-btn:hover { color: var(--text-gold); border-color: var(--text-gold); }
+
+        /* --- 页面标题 --- */
+        .header-area {
+            padding: 80px 0 20px;
+            text-align: center;
+        }
+        .header-area h1 {
+            font-size: 3rem;
+            font-weight: 200;
+            letter-spacing: 15px;
+            color: var(--text-gold);
+            margin-bottom: 10px;
+        }
+        .header-area p {
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            color: var(--dim-gold);
+            text-transform: uppercase;
+        }
+
+        /* --- 礼俗网格布局 --- */
+        .rituals-container {
+            max-width: 1200px;
+            margin: 60px auto 100px;
+            padding: 0 40px;
+        }
+
+        .rituals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 50px; /* 间距留白充足 */
+        }
+
+        /* 礼俗卡片基础样式 */
+        .ritual-card {
+            position: relative;
+            height: 350px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid var(--line-subtle);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 图片背景配置 */
+        .ritual-card[data-type="belief"] { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1590510326441-d98c763b6521?auto=format&fit=crop&q=80&w=1200'); }
+        .ritual-card[data-type="wedding"] { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=1200'); }
+        .ritual-card[data-type="clothing"] { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=1200'); }
+        .ritual-card[data-type="boat"] { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=1200'); }
+
+        .ritual-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            transition: 0.5s;
+            z-index: 1;
+        }
+
+        .ritual-card:hover::before {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* 卡片标题 */
+        .ritual-title-box {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .ritual-card h2 {
+            font-size: 2rem;
+            font-weight: 200;
+            letter-spacing: 10px;
+            color: var(--text-gold);
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            transition: 0.5s;
+        }
+
+        /* 选中态效果 */
+        .ritual-card.active {
+            transform: scale(1.05);
+            border-color: var(--text-gold);
+            box-shadow: 0 0 40px rgba(201, 173, 134, 0.2);
+            z-index: 10;
+        }
+
+        .ritual-card.active h2 {
+            letter-spacing: 15px;
+            color: #fff;
+        }
+
+        /* --- 详情面板设计 --- */
+        .detail-panel {
+            grid-column: 1 / -1; /* 跨越两列 */
+            height: 0;
+            overflow: hidden;
+            background: rgba(15, 17, 20, 0.9);
+            backdrop-filter: blur(20px);
+            border: 0 solid var(--line-subtle);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .detail-panel.show {
+            height: auto;
+            min-height: 300px;
+            margin-top: -20px;
+            margin-bottom: 20px;
+            padding: 60px;
+            border: 1px solid var(--line-subtle);
+            border-top: 3px solid var(--text-gold);
+        }
+
+        .detail-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.5s 0.3s ease-out;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .detail-panel.show .detail-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .detail-content h3 {
+            font-size: 1.6rem;
+            color: var(--text-gold);
+            margin-bottom: 25px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-content h3::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--line-subtle);
+            margin-left: 20px;
+        }
+
+        .detail-content p {
+            font-size: 1rem;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: justify;
+            white-space: pre-wrap;
+        }
+
+        /* 关闭按钮 */
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: var(--dim-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-btn:hover { color: var(--text-gold); transform: rotate(90deg); }
+
+        @media (max-width: 900px) {
+            .rituals-grid { grid-template-columns: 1fr; gap: 30px; }
+            .header-area h1 { font-size: 2.2rem; letter-spacing: 10px; }
+            .ritual-card { height: 250px; }
+            .detail-panel.show { padding: 40px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn">← 归航</a>
+
+    <div class="header-area">
+        <h1>沧海礼俗</h1>
+        <p>RITUALS OF THE FLOATING LIFE</p>
+    </div>
+
+    <section class="rituals-container">
+        <div class="rituals-grid">
+            
+            <!-- 海神信仰 -->
+            <div class="ritual-card" data-type="belief" id="card-belief" onclick="showDetail('belief')">
+                <div class="ritual-title-box"><h2>海神信仰</h2></div>
+            </div>
+
+            <!-- 水上婚礼 -->
+            <div class="ritual-card" data-type="wedding" id="card-wedding" onclick="showDetail('wedding')">
+                <div class="ritual-title-box"><h2>水上婚礼</h2></div>
+            </div>
+
+            <!-- 详情面板：放置在第一行之后（为了布局逻辑简单，我们利用 Grid 控制） -->
+            <!-- 如果需要面板精准出现在某一行下方，可用 JS 动态移动位置，这里默认在 Grid 末尾显示或跨行显示 -->
+            <div id="detail-box" class="detail-panel">
+                <span class="close-btn" onclick="closeAll()">×</span>
+                <div id="content-belief" class="detail-content" style="display:none;">
+                    <h3>海神信仰：生计与守护</h3>
+                    <p>疍民的生计深深地依赖于海洋。在漫长的海上生活中，他们将海洋赋予了神性，将海洋视作生命之源，将海神视为守护者和主宰者。在疍民社会中，海神的形象以多元化呈现，据统计疍民海神崇拜有兄弟公崇拜、五龙公崇拜、海螺姑娘崇拜、观音崇拜、妈祖崇拜等。
+
+其中，广州、福建、海南、香港、澳门疍民族群内的妈祖信仰影响最为深远，其原型为南宋疍民女子林默娘，其父兄皆为远洋航海疍民。台湾新界居民至今，新界的居民依然称她为一个“疍民”的第七个孩子。对于妈祖的祭拜，仍是这一地区最重要的宗教仪式，每逢妈祖诞会举办祈福活动，祈求航行平安、渔业丰收。如陵水黎族自治县新村港的“三江娘娘庙”，至今当地疍民仍在出海、婚嫁等重要节点前往祭拜，海神信仰成为连接疍民族群情感与海洋生存的精神纽带。</p>
+                </div>
+
+                <div id="content-wedding" class="detail-content" style="display:none;">
+                    <h3>水上婚礼：极致的仪式感</h3>
+                    <p>水上婚礼是疍民文化中最具仪式感的民俗符号，阳江疍民水上婚礼以其独特的海洋叙事与完整的礼仪流程，成为岭南疍家婚俗的典范，2007年3月，以闸坡疍家渔民婚俗之名入选广东省级非物质文化遗产名录。
+
+据当地疍民所述，婚礼流程极具疍家传统韵味，先由媒婆说媒合八字定婚约，男方婚前三天送酒、猪肉等过礼。接亲仪式恪守凌晨 2-3 点举办的传统古俗，这一习俗源于往昔疍民海上漂泊、担忧新娘遭岸上人员劫掠的历史，暗夜行船既为隐蔽行踪，也承载着对婚姻安稳的祈愿。接亲队伍的人数亦有讲究，必以单数成行，待迎回新娘后便成“单数去，双数回” 的圆满格局，新娘在咸水歌的哭嫁声中，由新郎背上船，完成接亲。如今该婚礼常作为展演呈现，闸坡每年的开渔季期间即有疍家婚嫁巡游。</p>
+                </div>
+
+                <div id="content-clothing" class="detail-content" style="display:none;">
+                    <h3>服饰文化：生存智慧的体现</h3>
+                    <p>疍家服饰是疍民海洋生存智慧的具象化体现，全国各地疍民服饰均以实用为核心，融合地域审美，整体以蓝黑为主基调，款式宽松简约，适配海上劳作，男女均着斜襟短衫、宽短裤，袖口宽大、裤脚及踝，便于海上作业时活动。
+
+广州疍家男女皆戴竹编筒式斗笠，外涂油防水防晒，笠带以彩色胶丝搭配贝壳珠粒编织而成，美观且不易被海风刮落。海南疍民服饰同样秉持实用原则，贴合南海气候与渔业劳作需求。主色以深蓝、藏青为主，面料轻薄透气，选用薯莨布等耐湿耐磨面料，当地妇女喜用彩色头巾包头，缀简单银饰，斗笠多为竹编尖顶，防水防晒。</p>
+                </div>
+
+                <div id="content-boat" class="detail-content" style="display:none;">
+                    <h3>疍家船：移动的海上家园</h3>
+                    <p>疍家船是疍民世代赖以生存的居所与生产工具，是海洋文明的鲜活载体，各地疍家船均以适配海上生活、便于渔业作业为核心，形制、功能随地域海域特征略有差异，但整体小巧灵活、坚固耐用，多采用优质木材打造，分住家船与作业船两类，承载着疍民“以海为田、以船为家”生存智慧与族群记忆。
+
+多为平底小舢板，船体轻盈，适配珠江流域浅滩水域，便于穿梭捕鱼、停靠避风。家船船内分区简洁，兼具作业、起居、供奉神明于一体。船头常绘简易纹路祈福，部分船只还会搭建简易棚屋抵御风雨。部分船只传承平头艇、棚仔艇的传统形制，是疍民海上漂泊的“移动家园”。新中国成立后，疍民逐渐上岸，从船上起居，过渡到岸边窝棚，最终发展为现代的水泥楼房。</p>
+                </div>
+            </div>
+
+            <!-- 服饰文化 -->
+            <div class="ritual-card" data-type="clothing" id="card-clothing" onclick="showDetail('clothing')">
+                <div class="ritual-title-box"><h2>服饰文化</h2></div>
+            </div>
+
+            <!-- 疍家船 -->
+            <div class="ritual-card" data-type="boat" id="card-boat" onclick="showDetail('boat')">
+                <div class="ritual-title-box"><h2>疍家船</h2></div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        function showDetail(type) {
+            const detailBox = document.getElementById('detail-box');
+            const cards = document.querySelectorAll('.ritual-card');
+            const contents = document.querySelectorAll('.detail-content');
+            const targetContent = document.getElementById('content-' + type);
+            const targetCard = document.getElementById('card-' + type);
+
+            // 如果点击的是已经激活的，则关闭
+            if (targetCard.classList.contains('active')) {
+                closeAll();
+                return;
+            }
+
+            // 重置所有卡片和内容
+            cards.forEach(c => c.classList.remove('active'));
+            contents.forEach(ct => ct.style.display = 'none');
+
+            // 激活当前
+            targetCard.classList.add('active');
+            targetContent.style.display = 'block';
+            detailBox.classList.add('show');
+
+            // 根据点击的位置调整 Panel 的顺序 (2x2网格逻辑)
+            // 第一排点击面板插在第二排前，第二排点击面板插在最后
+            if (type === 'belief' || type === 'wedding') {
+                detailBox.style.order = "1";
+                document.getElementById('card-clothing').style.order = "2";
+                document.getElementById('card-boat').style.order = "2";
+            } else {
+                detailBox.style.order = "3";
+            }
+
+            // 平滑滚动
+            setTimeout(() => {
+                detailBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function closeAll() {
+            const detailBox = document.getElementById('detail-box');
+            const cards = document.querySelectorAll('.ritual-card');
+            detailBox.classList.remove('show');
+            cards.forEach(c => c.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>

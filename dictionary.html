@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疍音流转 - 濒危方言数据库</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dictionary.css">
+</head>
+<body class="dict-page">
+
+    <a href="index.html" class="back-home">← 归航</a>
+
+    <header class="dict-header">
+        <h1>疍音流转</h1>
+        <p>VOICE OF THE SEA: DIALECT DATABASE</p>
+    </header>
+
+    <main class="dual-layout">
+        
+        <aside class="sidebar-guide">
+            <div class="sticky-content">
+                <nav class="dialect-selector">
+                    <button class="dialect-btn active" data-point="hailing">阳江海陵</button>
+                    <button class="dialect-btn" data-point="lingshui">海南陵水</button>
+                    
+                    <div class="developing-group">
+                        <span class="dev-item">潮州（开发中）</span>
+                        <span class="dev-item">电白（开发中）</span>
+                    </div>
+                </nav>
+
+                <div class="dialect-intro">
+                    <h2 id="pointName">阳江海陵岛</h2>
+                    <p id="pointDesc">加载中...</p> <div class="meta-data">
+                        <p>濒危等级：<span>极高</span></p>
+                        <p>记录载体：<span>数字采样</span></p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="vertical-divider"></div>
+
+        <section class="main-explorer">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="探寻消失的音节...">
+                <button id="searchTrigger">
+    <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+    </svg>
+</button>
+            </div>
+
+            <div class="word-grid" id="wordGrid">
+                </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="voiceModal"></div>
+
+    <script src="js/dictionary.js"></script>
+</body>
+</html>

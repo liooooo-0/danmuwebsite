@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沧海经纬 - 疍家地理版图</title>
+    <!-- 统一字体引用 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;           /* 核心背景深邃黑 */
+            --sea-ink: #0d141d;           /* 墨蓝色海洋 */
+            --land-matte: #2a2835;        /* 哑光灰紫陆地 */
+            --text-gold: #c9ad86;         /* 核心金色 */
+            --dim-gold: rgba(201, 173, 134, 0.5); 
+            --active-cyan: #a0ffe6;       /* 交互淡青色 */
+            --serif: 'Noto Serif SC', serif;
+            --song: 'SimSun', 'STSong', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f5f5f5;
+            font-family: var(--serif);
+            overflow: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 顶部题头：回归博物馆高级感 --- */
+        .map-header {
+            position: absolute;
+            top: 8vh;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .map-header h1 {
+            font-size: 3.2rem;
+            font-weight: 200;
+            letter-spacing: 24px; /* 极宽间距展现史诗感 */
+            color: var(--text-gold);
+            margin-left: 24px; /* 视觉对齐 */
+        }
+        .map-header p {
+            font-size: 0.75rem;
+            letter-spacing: 6px;
+            color: var(--dim-gold);
+            margin-top: 12px;
+            text-transform: uppercase;
+        }
+
+        /* --- 返回按钮：对齐全局 UI --- */
+        .back-btn {
+            position: fixed; top: 40px; left: 5%; z-index: 1000;
+            color: var(--dim-gold); text-decoration: none; font-size: 0.8rem;
+            border-bottom: 1px solid transparent; transition: 0.3s;
+            letter-spacing: 2px;
+        }
+        .back-btn:hover { color: var(--text-gold); border-color: var(--text-gold); }
+
+        /* --- 地图容器 --- */
+        .map-container {
+            width: 100vw; height: 100vh;
+            position: relative;
+            background: var(--sea-ink);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 矢量陆地模拟：毛边质感 */
+        .land-vector {
+            position: absolute;
+            width: 130%; height: 130%;
+            background: var(--land-matte);
+            filter: contrast(1.2) brightness(0.9);
+            /* 模拟毛边与地理轮廓 */
+            clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 88% 38%, 78% 35%, 65% 50%, 55% 55%, 48% 72%, 35% 82%, 15% 90%, 0% 100%);
+            opacity: 0.6;
+            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
+            pointer-events: none;
+        }
+
+        /* 经纬网格线 */
+        .grid-overlay {
+            position: absolute; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(201,173,134,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,173,134,0.03) 1px, transparent 1px);
+            background-size: 120px 120px;
+            pointer-events: none;
+        }
+
+        /* 地图标注点：火漆墨点质感 */
+        .map-point {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: rgba(224, 229, 236, 0.4); /* 初始浅灰荧光 */
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 50;
+        }
+
+        .map-point:hover {
+            transform: scale(1.4);
+            background: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .map-point.active {
+            background: var(--active-cyan);
+            box-shadow: 0 0 0 12px rgba(160, 255, 230, 0.08), 0 0 25px var(--active-cyan);
+        }
+
+        /* 地图标注字体设定 */
+        .point-label {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            white-space: nowrap; pointer-events: none;
+            font-family: var(--song);
+            color: var(--dim-gold);
+            transition: 0.3s;
+        }
+
+        /* 省级标注：小4 (约16px) */
+        .label-prov { font-size: 16px; letter-spacing: 4px; font-weight: 600; opacity: 0.8; }
+        /* 市县标注：5号 (约14px) */
+        .label-city { font-size: 14px; letter-spacing: 2px; opacity: 0.6; }
+
+        .map-point:hover .point-label { color: #fff; opacity: 1; }
+
+        /* 悬浮弹窗：对齐博物馆卡片风格 */
+        .location-pop {
+            position: absolute;
+            width: 340px;
+            background: rgba(10, 11, 13, 0.95);
+            border: 1px solid var(--line-subtle);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            transform: translate(-50%, calc(-100% - 40px));
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+        }
+
+        .pop-tag {
+            background: var(--ink-red, #8b0000);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 12px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .pop-coords {
+            position: absolute; top: 32px; right: 30px;
+            font-size: 0.65rem; color: var(--dim-gold);
+            font-family: monospace;
+        }
+
+        .pop-title {
+            font-size: 1.5rem; color: var(--text-gold);
+            margin-bottom: 15px; font-weight: 200;
+            border-bottom: 1px solid var(--line-subtle);
+            padding-bottom: 10px;
+        }
+
+        .pop-content {
+            font-size: 0.9rem; line-height: 1.9; color: rgba(255,255,255,0.75);
+            text-align: justify;
+        }
+
+        /* 右下角交互提示 */
+        .hint-text {
+            position: fixed; bottom: 50px; right: 5%;
+            font-size: 0.75rem; letter-spacing: 3px; color: var(--dim-gold);
+            font-family: var(--song);
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn">← 归航</a>
+
+    <header class="map-header">
+        <h1>沧海经纬</h1>
+        <p>G E O G R A P H Y &nbsp; O F &nbsp; T H E &nbsp; T I D E S</p>
+    </header>
+
+    <div class="map-container" id="mainMap">
+        <div class="grid-overlay"></div>
+        <div class="land-vector"></div>
+
+        <!-- 坐标点位数据 -->
+        <!-- 海南省：省级小4 -->
+        <div class="map-point" style="top: 75%; left: 45%;" 
+             data-prov="海南 三亚" data-title="三亚港疍民" data-coords="18.3011, 109.4481"
+             data-info="三亚疍民以天涯区南边海新渔村为主要聚居区。其“咸水歌”于2021年被列入国家级非遗名录，2015年建成三亚疍家文化馆。">
+             <span class="point-label label-prov">三亚港</span>
+        </div>
+
+        <div class="map-point" style="top: 72%; left: 49%;" 
+             data-prov="海南 陵水" data-title="陵水黎族自治县疍民" data-coords="18.4124, 109.9713"
+             data-info="抗战时期受驱逐迁徙至此。陵水新村为聚居核心，方言属粤语，传承三江娘娘信仰。现拥有国内首个海南疍家博物馆。">
+             <span class="point-label label-city">陵水</span>
+        </div>
+
+        <!-- 广东省：市县采用5号 -->
+        <div class="map-point" style="top: 55%; left: 55%;" 
+             data-prov="广东 阳江" data-title="阳江沿海疍民" data-coords="21.8603, 111.9776"
+             data-info="由咸水与淡水两支组成，聚居在闸坡、东平等地。闸坡疍家婚俗乃阳江独有水上礼仪，2007年入选省级非遗名录。">
+             <span class="point-label label-city">闸坡</span>
+        </div>
+
+        <div class="map-point" style="top: 50%; left: 63%;" 
+             data-prov="广东 东莞" data-title="沙田镇疍民" data-coords="22.9197, 113.6182"
+             data-info="珠三角核心疍家群体。抗战时曾助建防线。其咸水歌与婚俗入选省级非遗，现依托疍家文化艺术中心传承薪火。">
+             <span class="point-label label-city">沙田</span>
+        </div>
+
+        <div class="map-point" style="top: 53%; left: 66%;" 
+             data-prov="香港" data-title="香港沿岸疍民" data-coords="22.3027, 114.1772"
+             data-info="聚居地集中在香港仔、大澳等。1960年后逐渐移居岸上渔光村。奉天后、谭公为海神，高度重视盂兰胜会传统。">
+             <span class="point-label label-city">香港仔</span>
+        </div>
+
+        <div class="map-point" style="top: 54%; left: 62%;" 
+             data-prov="澳门" data-title="澳门内港疍民" data-coords="22.2109, 113.5529"
+             data-info="澳门最早住民。Macau名称由来据传与妈祖信仰有关。部分疍家女与葡人通婚，成为土生葡人母系来源之一。">
+             <span class="point-label label-city">澳门</span>
+        </div>
+
+        <!-- 悬浮弹窗 -->
+        <div class="location-pop" id="popBox">
+            <span class="pop-tag" id="popProv">广东 阳江</span>
+            <span class="pop-coords" id="popCoords">113.15E, 23.07N</span>
+            <h3 class="pop-title" id="popTitle">地点名称</h3>
+            <p class="pop-content" id="popContent">载入中...</p>
+        </div>
+
+        <div class="hint-text">悬停或点击光点查看历史地图详情</div>
+    </div>
+
+    <script>
+        const points = document.querySelectorAll('.map-point');
+        const popBox = document.getElementById('popBox');
+        const popProv = document.getElementById('popProv');
+        const popCoords = document.getElementById('popCoords');
+        const popTitle = document.getElementById('popTitle');
+        const popContent = document.getElementById('popContent');
+
+        points.forEach(point => {
+            point.addEventListener('mouseenter', () => {
+                popProv.innerText = point.getAttribute('data-prov');
+                popCoords.innerText = point.getAttribute('data-coords');
+                popTitle.innerText = point.getAttribute('data-title');
+                popContent.innerText = point.getAttribute('data-info');
+                
+                popBox.style.display = 'block';
+                popBox.style.left = point.style.left;
+                popBox.style.top = point.style.top;
+            });
+
+            point.addEventListener('mouseleave', () => {
+                popBox.style.display = 'none';
+            });
+
+            point.addEventListener('click', () => {
+                points.forEach(p => p.classList.remove('active'));
+                point.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
