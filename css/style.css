@@ -1,0 +1,38 @@
+:root {
+    --bg-dark: #0a0b0d;           /* 深邃黑背景 */
+    --text-gold: #c9ad86;         /* 核心金色 */
+    --dim-gold: rgba(201, 173, 134, 0.5); /* 辅助金/暗金 */
+    --line-subtle: rgba(201, 173, 134, 0.15); /* 装饰线颜色 */
+    --serif: 'Noto Serif SC', serif; /* 统一宋体 */
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    /* 统一的微弱径向渐变，增加高级感 */
+    background-image: radial-gradient(circle at 50% 50%, #161a1e 0%, #0a0b0d 100%);
+    color: #f5f5f5;
+    font-family: var(--serif);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased; /* 让字体在深色背景下更清晰 */
+}
+.back-home {
+    position: fixed;
+    top: 40px;
+    left: 5%;
+    color: var(--dim-gold);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    z-index: 9999; /* 确保在所有页面元素的最顶层 */
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.back-home:hover {
+    color: var(--text-gold);
+    transform: translateX(-5px);
+}
