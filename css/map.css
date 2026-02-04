@@ -1,0 +1,229 @@
+/* =================================================
+   疍幕 - 沧海经纬 (羊皮纸航海图版)
+   逻辑：保留用户原始配色，优化大画幅排版与卡片交互
+   ================================================= */
+
+:root {
+    /* 引入项目核心色值 */
+    --bg-paper: #d2c1a3;    /* 羊皮纸底色 */
+    --ink-black: #2a2a2a;   /* 墨迹色 */
+    --ink-red: #802a2a;     /* 钤印/强调色 */
+    --line-gold: #8d764d;   /* 航线色 */
+    --serif: 'Noto Serif SC', serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-paper);
+    /* 引入真实羊皮纸纹理 */
+    background-image: url('https://www.transparenttextures.com/patterns/old-map.png');
+    color: var(--ink-black);
+    font-family: var(--serif);
+    overflow: hidden;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- 顶部题头区 (取代原左下角标题) --- */
+.map-header {
+    position: absolute;
+    top: 6vh;
+    width: 100%;
+    text-align: center;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.map-header h1 {
+    font-size: 3.2rem;
+    font-weight: 200;
+    letter-spacing: 22px; /* 延续项目的呼吸感间距 */
+    color: var(--ink-black);
+    margin-left: 22px; /* 视觉对齐 */
+    opacity: 0.9;
+}
+
+.map-header p {
+    font-size: 0.75rem;
+    letter-spacing: 6px;
+    opacity: 0.5;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+/* --- 返回按钮：对齐项目全局风格 --- */
+.back-btn {
+    position: fixed;
+    top: 40px;
+    right: 5%;
+    z-index: 1000;
+    color: var(--ink-black);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: 1px solid var(--ink-black);
+    padding: 8px 24px;
+    letter-spacing: 3px;
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.back-btn:hover {
+    background: var(--ink-black);
+    color: var(--bg-paper);
+}
+
+/* --- 地图容器：增加经纬网格 --- */
+.map-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 增加一层淡淡的经纬线网格 */
+    background-image: 
+        linear-gradient(rgba(42, 42, 42, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42, 42, 42, 0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+}
+
+/* 装饰：罗盘玫瑰 */
+.compass-rose {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    opacity: 0.12;
+    pointer-events: none;
+    border: 1px dashed var(--ink-black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.compass-rose::before {
+    content: 'N';
+    position: absolute;
+    top: -40px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+/* 地图点位：火漆/墨点感 */
+.map-point {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--ink-black);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 10;
+}
+
+.map-point::after {
+    content: attr(data-location);
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    color: var(--ink-black);
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.map-point:hover {
+    transform: scale(1.8);
+    background: var(--ink-red);
+    box-shadow: 0 0 15px rgba(128, 42, 42, 0.3);
+}
+
+.map-point:hover::after {
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* 航线虚线 */
+.navigation-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 坐标数字标注 */
+.coordinate-label {
+    position: absolute;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+/* 地点批注浮窗：优化为鼠标上方显示 */
+.location-note {
+    position: absolute;
+    width: 350px;
+    border: 1px solid var(--ink-black);
+    padding: 25px;
+    background: rgba(210, 193, 163, 0.98); /* 稍微增加不透明度确保阅读 */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+    pointer-events: none;
+    z-index: 2000;
+    
+    /* 核心修改：确保浮窗出现在触发点的正上方 */
+    transform: translate(-50%, calc(-100% - 35px));
+    transition: opacity 0.3s, transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.location-note h3 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--ink-black);
+    padding-bottom: 8px;
+    font-weight: 400;
+    letter-spacing: 4px;
+}
+
+.location-note p {
+    font-size: 0.95rem;
+    line-height: 2;
+    color: rgba(42, 42, 42, 0.85);
+    text-align: justify;
+    letter-spacing: 1.2px;
+}
+
+/* 页面底部侧边装饰 (由原标题区转化) */
+.map-footer-text {
+    position: absolute;
+    bottom: 50px;
+    left: 5%;
+    max-width: 400px;
+    opacity: 0.4;
+    border-left: 1px solid var(--ink-black);
+    padding-left: 20px;
+    pointer-events: none;
+}
+
+.map-footer-text h2 {
+    font-size: 1rem;
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+    font-weight: 400;
+}
+
+.map-footer-text p {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    line-height: 1.6;
+}

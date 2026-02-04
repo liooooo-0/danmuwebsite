@@ -1,0 +1,225 @@
+/* =================================================
+   疍音流转 - 博物馆双栏重塑版 (完整样式)
+   ================================================= */
+
+/* 1. 核心定义 */
+:root {
+    --bg-dark: #0a0b0d;
+    --text-gold: #c9ad86;
+    --dim-gold: rgba(201, 173, 134, 0.5);
+    --line-subtle: rgba(201, 173, 134, 0.15);
+    --serif: 'Noto Serif SC', serif;
+}
+
+/* 2. 全局重置 */
+body.dict-page {
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at 50% 50%, #161a1e 0%, #0a0b0d 100%);
+    color: #f5f5f5;
+    font-family: var(--serif);
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* 3. 顶部标题区 */
+.dict-header {
+    padding-top: 10vh;
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.dict-header h1 {
+    font-size: 3.5rem;
+    font-weight: 200;
+    letter-spacing: 18px;
+    color: var(--text-gold);
+    margin: 0;
+    text-indent: 18px;
+}
+
+.dict-header p {
+    font-size: 0.75rem;
+    color: var(--dim-gold);
+    letter-spacing: 5px;
+    margin-top: 15px;
+}
+
+.back-home {
+    position: fixed;
+    top: 40px;
+    left: 5%;
+    color: var(--dim-gold);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    z-index: 100;
+    transition: 0.3s;
+}
+.back-home:hover { color: var(--text-gold); }
+
+/* 4. 双栏核心布局 */
+.dual-layout {
+    display: flex;
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-bottom: 100px;
+}
+
+/* 左栏：介绍区 */
+.sidebar-guide {
+    flex: 0 0 320px;
+}
+
+.sticky-content {
+    position: sticky;
+    top: 60px;
+}
+
+.dialect-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.dialect-btn {
+    background: transparent;
+    border: 1px solid var(--line-subtle);
+    color: var(--dim-gold);
+    padding: 14px 20px;
+    text-align: left;
+    font-family: var(--serif);
+    cursor: pointer;
+    transition: all 0.4s;
+}
+
+.dialect-btn.active {
+    border-left: 4px solid var(--text-gold);
+    color: var(--text-gold);
+    background: rgba(201, 173, 134, 0.05);
+}
+
+.developing-group {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dev-item {
+    font-size: 0.75rem;
+    color: #444;
+    padding-left: 20px;
+}
+
+.dialect-intro h2 {
+    font-size: 1.8rem;
+    color: var(--text-gold);
+    margin: 30px 0 15px;
+    font-weight: 400;
+}
+
+.dialect-intro p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.4);
+}
+
+/* 中间：垂直分割线 */
+.vertical-divider {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--text-gold), transparent);
+    opacity: 0.2;
+    margin: 0 60px;
+    align-self: stretch;
+}
+
+/* 右栏：探索区 */
+.main-explorer {
+    flex: 1;
+}
+
+/* 5. 搜索框样式 */
+.search-box {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--line-subtle);
+    padding: 10px 0;
+    margin-bottom: 40px;
+}
+
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    padding: 10px;
+}
+
+.search-box button {
+    background: transparent;
+    border: none;
+    color: var(--text-gold);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* 6. 字卡与署名 */
+.word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.word-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--line-subtle);
+    padding: 25px;
+    transition: 0.4s;
+}
+
+.word-card:hover {
+    border-color: var(--text-gold);
+    transform: translateY(-5px);
+}
+
+.card-top {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.card-top .char { font-size: 2.2rem; color: var(--text-gold); }
+.card-top .pinyin { color: var(--dim-gold); font-style: italic; font-size: 0.9rem; }
+
+.audio-btn {
+    background: transparent;
+    border: none;
+    color: var(--dim-gold);
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.audio-btn:hover { color: var(--text-gold); }
+
+.word-card .meaning {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+}
+
+/* 署名样式 */
+.speaker-tag {
+    display: block;
+    margin-top: 20px;
+    font-size: 0.7rem;
+    color: var(--dim-gold);
+    border-top: 1px dotted var(--line-subtle);
+    padding-top: 12px;
+    text-align: right;
+}
